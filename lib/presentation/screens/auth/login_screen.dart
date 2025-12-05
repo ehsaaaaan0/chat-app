@@ -31,12 +31,14 @@ class _LoginScreenState extends State<LoginScreen> {
     if (value == null || value.isEmpty) {
       return "Please Enter Your Email";
     }
+    return null;
   }
 
   String? _validatePassword(String? value) {
     if (value == null || value.isEmpty) {
       return "Please Enter Password";
     }
+    return null;
   }
 
   @override
