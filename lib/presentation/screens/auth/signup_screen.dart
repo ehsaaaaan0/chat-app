@@ -1,35 +1,67 @@
 import 'package:chatapp/core/common/custom_button.dart';
 import 'package:chatapp/core/common/custom_text_field.dart';
-import 'package:chatapp/presentation/screens/auth/signup_screen.dart';
+import 'package:chatapp/presentation/screens/auth/login_screen.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class SignupScreen extends StatefulWidget {
+  const SignupScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<SignupScreen> createState() => _SignupScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _SignupScreenState extends State<SignupScreen> {
   final _formkey = GlobalKey<FormState>();
-  final TextEditingController emailController = TextEditingController();
+  final TextEditingController emaiController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController phoneNumberController = TextEditingController();
+
+  bool _isPasswordVisible = false;
+  final _nameFocus = FocusNode();
+  final _usernameFocus = FocusNode();
   final _emailFocus = FocusNode();
   final _passwordFocus = FocusNode();
-  bool _isPasswordVisible = false;
+  final _phoneFocus = FocusNode();
+
   @override
   void dispose() {
-    emailController.dispose();
+    emaiController.dispose();
     passwordController.dispose();
+    nameController.dispose();
+    usernameController.dispose();
+    phoneNumberController.dispose();
+    _nameFocus.dispose();
+    _usernameFocus.dispose();
     _emailFocus.dispose();
     _passwordFocus.dispose();
+    _phoneFocus.dispose();
     super.dispose();
+  }
+
+  String? _validateName(String? value) {
+    if (value == null || value.isEmpty) {
+      return "Please Enter Your Full Name";
+    }
+  }
+
+  String? _validateUserName(String? value) {
+    if (value == null || value.isEmpty) {
+      return "Please Enter Your userName";
+    }
   }
 
   String? _validatEmail(String? value) {
     if (value == null || value.isEmpty) {
       return "Please Enter Your Email";
+    }
+  }
+
+  String? _validatePhoneNumber(String? value) {
+    if (value == null || value.isEmpty) {
+      return "Please Enter Your Phone Number";
     }
   }
 
@@ -42,6 +74,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(),
       body: SafeArea(
         child: Form(
           key: _formkey,
@@ -50,27 +83,50 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(height: 30),
                 Text(
-                  "Welcome Back",
+                  "Create Account",
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 SizedBox(height: 10),
                 Text(
-                  "Sign In to continue",
+                  "Please fill in the details",
                   style: Theme.of(
                     context,
                   ).textTheme.bodyLarge?.copyWith(color: Colors.grey),
                 ),
                 SizedBox(height: 30),
                 CustomTextField(
-                  controller: emailController,
+                  controller: nameController,
+                  hintText: "Full Name",
+                  focusNode: _nameFocus,
+                  validator: _validateName,
+                  prefixIcon: Icon(Icons.person_outline),
+                ),
+                SizedBox(height: 16),
+                CustomTextField(
+                  controller: usernameController,
+                  hintText: "User Name",
+                  validator: _validateUserName,
+                  focusNode: _usernameFocus,
+                  prefixIcon: Icon(Icons.alternate_email),
+                ),
+                SizedBox(height: 16),
+                CustomTextField(
+                  controller: emaiController,
                   hintText: "Email",
                   focusNode: _emailFocus,
                   validator: _validatEmail,
                   prefixIcon: Icon(Icons.email_outlined),
+                ),
+                SizedBox(height: 16),
+                CustomTextField(
+                  controller: phoneNumberController,
+                  hintText: "Phone Number",
+                  focusNode: _phoneFocus,
+                  validator: _validatePhoneNumber,
+                  prefixIcon: Icon(Icons.phone_outlined),
                 ),
                 SizedBox(height: 16),
                 CustomTextField(
@@ -79,18 +135,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   focusNode: _passwordFocus,
                   validator: _validatePassword,
                   obscureText: !_isPasswordVisible,
-                  prefixIcon: Icon(Icons.password_outlined),
+                  prefixIcon: Icon(!_isPasswordVisible?Icons.visibility_off: Icons.visibility),
                   suffixIcon: IconButton(
                     onPressed: () {
                       setState(() {
-                        _isPasswordVisible = !_isPasswordVisible;
+                        _isPasswordVisible != _isPasswordVisible;
                       });
                     },
-                    icon: Icon(
-                      _isPasswordVisible
-                          ? Icons.visibility_off
-                          : Icons.visibility,
-                    ),
+                    icon: Icon(Icons.visibility),
                   ),
                 ),
                 SizedBox(height: 30),
@@ -99,17 +151,17 @@ class _LoginScreenState extends State<LoginScreen> {
                     FocusScope.of(context).unfocus();
                     if (_formkey.currentState?.validate() ?? false) {}
                   },
-                  text: "Login",
+                  text: "Register",
                 ),
                 SizedBox(height: 16),
                 Center(
                   child: RichText(
                     text: TextSpan(
-                      text: "Don't have an account?  ",
+                      text: "Already have an account?  ",
                       style: TextStyle(color: Colors.grey[600]),
                       children: [
                         TextSpan(
-                          text: "Sign Up",
+                          text: "Login",
                           style: Theme.of(context).textTheme.bodyLarge
                               ?.copyWith(
                                 color: Theme.of(context).primaryColor,
@@ -117,12 +169,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                           recognizer: TapGestureRecognizer()
                             ..onTap = () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => SignupScreen(),
-                                ),
-                              );
+                              Navigator.pop(context);
                             },
                         ),
                       ],
