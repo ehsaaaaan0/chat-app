@@ -1,12 +1,11 @@
 import 'package:chatapp/config/theme/app_theme.dart';
-import 'package:chatapp/firebase_options.dart';
+import 'package:chatapp/data/services/service_locator.dart';
 import 'package:chatapp/presentation/screens/auth/login_screen.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:chatapp/router/app_router.dart';
 import 'package:flutter/material.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await setUpServiceLocator();
   runApp(const MyApp());
 }
 
@@ -20,9 +19,13 @@ class MyApp extends StatelessWidget {
       title: 'Chat App',
 
       debugShowCheckedModeBanner: false,
-
+      navigatorKey: getit<AppRouter>().navigatorKey,
       theme: AppTheme.lightTheme,
       home: LoginScreen(),
     );
   }
 }
+
+// base repository
+// getit -- service locator in flutter that help to manage dependencies (Dilevery boy)
+// cubit
