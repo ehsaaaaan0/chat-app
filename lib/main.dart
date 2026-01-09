@@ -26,6 +26,3 @@ class MyApp extends StatelessWidget {
   }
 }
 
-// base repository
-// getit -- service locator in flutter that help to manage dependencies (Dilevery boy)
-// cubit

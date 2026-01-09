@@ -1,5 +1,6 @@
 import 'package:chatapp/core/common/custom_button.dart';
 import 'package:chatapp/core/common/custom_text_field.dart';
+import 'package:chatapp/data/repositories/auth_repository.dart';
 import 'package:chatapp/data/services/service_locator.dart';
 import 'package:chatapp/presentation/screens/auth/login_screen.dart';
 import 'package:chatapp/router/app_router.dart';
@@ -70,6 +71,27 @@ class _SignupScreenState extends State<SignupScreen> {
   String? _validatePassword(String? value) {
     if (value == null || value.isEmpty) {
       return "Please Enter Password";
+    }
+  }
+
+  Future<void> handelSignUp() async {
+    FocusScope.of(context).unfocus();
+    if (_formkey.currentState?.validate() ?? false) {
+      try {
+        getit<AuthRepository>().signUp(
+          fullName: nameController.text,
+          email: emaiController.text,
+          userName: usernameController.text,
+          phoneNumber: phoneNumberController.text,
+          password: passwordController.text,
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(e.toString())));
+      }
+    } else {
+      print("form validation failed");
     }
   }
 
@@ -152,13 +174,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                 ),
                 SizedBox(height: 30),
-                CustomButton(
-                  onPressed: () {
-                    FocusScope.of(context).unfocus();
-                    if (_formkey.currentState?.validate() ?? false) {}
-                  },
-                  text: "Register",
-                ),
+                CustomButton(onPressed: handelSignUp, text: "Register"),
                 SizedBox(height: 16),
                 Center(
                   child: RichText(
