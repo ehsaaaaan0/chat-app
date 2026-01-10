@@ -2,6 +2,7 @@ import 'package:chatapp/core/common/custom_button.dart';
 import 'package:chatapp/core/common/custom_text_field.dart';
 import 'package:chatapp/data/repositories/auth_repository.dart';
 import 'package:chatapp/data/services/service_locator.dart';
+import 'package:chatapp/logic/cubits/auth/auth_cubit.dart';
 import 'package:chatapp/presentation/screens/auth/login_screen.dart';
 import 'package:chatapp/router/app_router.dart';
 import 'package:flutter/gestures.dart';
@@ -78,7 +79,7 @@ class _SignupScreenState extends State<SignupScreen> {
     FocusScope.of(context).unfocus();
     if (_formkey.currentState?.validate() ?? false) {
       try {
-        getit<AuthRepository>().signUp(
+        getit<AuthCubit>().signUp(
           fullName: nameController.text,
           email: emaiController.text,
           userName: usernameController.text,

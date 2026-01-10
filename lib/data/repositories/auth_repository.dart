@@ -61,6 +61,10 @@ class AuthRepository extends BasedRepository {
     }
   }
 
+  Future<void> signOut() async {
+    auth.signOut();
+  }
+
   Future<void> saveUSerData(UserModel user) async {
     try {
       firestore.collection("user").doc(user.uid).set(user.toMap());

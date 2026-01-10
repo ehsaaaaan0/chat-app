@@ -10,7 +10,7 @@ class AuthState extends Equatable {
   final UserModel? user;
   final String? error;
 
-  AuthState({ this.status = AuthStatus.initial, this.user, this.error});
+  const AuthState({ this.status = AuthStatus.initial, this.user, this.error});
   
 
   AuthState copyWith({
