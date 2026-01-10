@@ -5,6 +5,7 @@ import 'package:chatapp/data/services/based_repository.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthRepository extends BasedRepository {
+  Stream<User?> get authStateChanges => auth.authStateChanges();
   Future<UserModel> signUp({
     required String fullName,
     required String email,
