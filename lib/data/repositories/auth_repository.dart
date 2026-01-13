@@ -110,7 +110,7 @@ class AuthRepository extends BasedRepository {
     }
   }
 
-    Future<bool> checkPhoneExists(String phoneNumber) async {
+  Future<bool> checkPhoneExists(String phoneNumber) async {
     try {
       final formatedPhoneNumber = phoneNumber.replaceAll(
         RegExp(r'\s+'),
@@ -140,5 +140,3 @@ class AuthRepository extends BasedRepository {
     }
   }
 }
-
-
