@@ -19,6 +19,18 @@ class AuthRepository extends BasedRepository {
         "".trim(),
       );
 
+      final emaailExists = await checkEmailExists(email);
+      if (emaailExists) {
+        throw "Email already in use";
+      }
+      final phoneExists = await checkPhoneExists(formatedPhoneNumber);
+      if (phoneExists) {
+        throw "Phone Number already in use";
+      }
+      final userNameExists = await checkUserNameExists(userName);
+      if (userNameExists) {
+        throw "User Name already in use";
+      }
       final userCredential = await auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
@@ -84,4 +96,49 @@ class AuthRepository extends BasedRepository {
       throw "Failed to get user Data";
     }
   }
+
+  Future<bool> checkEmailExists(String email) async {
+    try {
+      final querySnapshot = await firestore
+          .collection("users")
+          .where("email", isEqualTo: email)
+          .get();
+      return querySnapshot.docs.isNotEmpty;
+    } catch (e) {
+      print("error checking email existence: $e");
+      return false;
+    }
+  }
+
+    Future<bool> checkPhoneExists(String phoneNumber) async {
+    try {
+      final formatedPhoneNumber = phoneNumber.replaceAll(
+        RegExp(r'\s+'),
+        "".trim(),
+      );
+      final quearySnapshot = await firestore
+          .collection("users")
+          .where("phoneNumber", isEqualTo: formatedPhoneNumber)
+          .get();
+      return quearySnapshot.docs.isEmpty;
+    } catch (e) {
+      print("error checking Phone existence: $e");
+      return false;
+    }
+  }
+
+  Future<bool> checkUserNameExists(String userName) async {
+    try {
+      final quearySnapshot = await firestore
+          .collection("users")
+          .where("userName", isEqualTo: userName)
+          .get();
+      return quearySnapshot.docs.isEmpty;
+    } catch (e) {
+      print("error checking email existence: $e");
+      return false;
+    }
+  }
 }
+
+
