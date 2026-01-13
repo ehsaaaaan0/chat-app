@@ -1,5 +1,6 @@
 import 'package:chatapp/core/common/custom_button.dart';
 import 'package:chatapp/core/common/custom_text_field.dart';
+import 'package:chatapp/core/utils/ui_utils.dart';
 import 'package:chatapp/data/services/service_locator.dart';
 import 'package:chatapp/logic/cubits/auth/auth_cubit.dart';
 import 'package:chatapp/logic/cubits/auth/auth_state.dart';
@@ -52,7 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
     FocusScope.of(context).unfocus();
     if (_formkey.currentState?.validate() ?? false) {
       try {
-        getit<AuthCubit>().signIn(
+        await getit<AuthCubit>().signIn(
           email: emailController.text,
           password: passwordController.text,
         );
@@ -68,106 +69,119 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<AuthCubit, AuthState>(
+    return BlocConsumer<AuthCubit, AuthState>(
       bloc: getit<AuthCubit>(),
-      listenWhen: (previous, current) {
-        return previous.status != current.status ||
-            previous.status != current.error;
-      },
+
       listener: (context, state) {
         if (state.status == AuthStatus.authenticated) {
           getit<AppRouter>().pushAndRemoveUntil(HomeScreen());
+        } else if (state.status == AuthStatus.error && state.error != null) {
+          UiUtils.showSnackBar(
+            context,
+            message: state.error ?? "An error occurred",
+            isError: true,
+          );
         }
       },
-      child: Scaffold(
-        body: SafeArea(
-          child: Form(
-            key: _formkey,
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: 30),
-                  Text(
-                    "Welcome Back",
-                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
+      builder: (context, state) {
+        return Scaffold(
+          body: SafeArea(
+            child: Form(
+              key: _formkey,
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 30),
+                    Text(
+                      "Welcome Back",
+                      style: Theme.of(context).textTheme.headlineMedium
+                          ?.copyWith(fontWeight: FontWeight.bold),
                     ),
-                  ),
-                  SizedBox(height: 10),
-                  Text(
-                    "Sign In to continue",
-                    style: Theme.of(
-                      context,
-                    ).textTheme.bodyLarge?.copyWith(color: Colors.grey),
-                  ),
-                  SizedBox(height: 30),
-                  CustomTextField(
-                    controller: emailController,
-                    hintText: "Email",
-                    focusNode: _emailFocus,
-                    validator: _validatEmail,
-                    prefixIcon: Icon(Icons.email_outlined),
-                  ),
-                  SizedBox(height: 16),
-                  CustomTextField(
-                    controller: passwordController,
-                    hintText: "Password",
-                    focusNode: _passwordFocus,
-                    validator: _validatePassword,
-                    obscureText: !_isPasswordVisible,
-                    prefixIcon: Icon(Icons.password_outlined),
-                    suffixIcon: IconButton(
-                      onPressed: () {
-                        setState(() {
-                          _isPasswordVisible = !_isPasswordVisible;
-                        });
-                      },
-                      icon: Icon(
-                        _isPasswordVisible
-                            ? Icons.visibility_off
-                            : Icons.visibility,
+                    SizedBox(height: 10),
+                    Text(
+                      "Sign In to continue",
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodyLarge?.copyWith(color: Colors.grey),
+                    ),
+                    SizedBox(height: 30),
+                    CustomTextField(
+                      controller: emailController,
+                      hintText: "Email",
+                      focusNode: _emailFocus,
+                      validator: _validatEmail,
+                      prefixIcon: Icon(Icons.email_outlined),
+                    ),
+                    SizedBox(height: 16),
+                    CustomTextField(
+                      controller: passwordController,
+                      hintText: "Password",
+                      focusNode: _passwordFocus,
+                      validator: _validatePassword,
+                      obscureText: !_isPasswordVisible,
+                      prefixIcon: Icon(Icons.password_outlined),
+                      suffixIcon: IconButton(
+                        onPressed: () {
+                          setState(() {
+                            _isPasswordVisible = !_isPasswordVisible;
+                          });
+                        },
+                        icon: Icon(
+                          _isPasswordVisible
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                        ),
                       ),
                     ),
-                  ),
-                  SizedBox(height: 30),
-                  CustomButton(onPressed: loginUser, text: "Login"),
-                  SizedBox(height: 16),
-                  Center(
-                    child: RichText(
-                      text: TextSpan(
-                        text: "Don't have an account?  ",
-                        style: TextStyle(color: Colors.grey[600]),
-                        children: [
-                          TextSpan(
-                            text: "Sign Up",
-                            style: Theme.of(context).textTheme.bodyLarge
-                                ?.copyWith(
-                                  color: Theme.of(context).primaryColor,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () {
-                                getit<AppRouter>().push(SignupScreen());
-                                // Navigator.push(
-                                //   context,
-                                //   MaterialPageRoute(
-                                //     builder: (context) => SignupScreen(),
-                                //   ),
-                                // );
-                              },
-                          ),
-                        ],
+                    SizedBox(height: 30),
+                    CustomButton(
+                      onPressed: loginUser,
+                      text: "Login",
+                      child: state.status == AuthStatus.loading
+                          ? const CircularProgressIndicator(color: Colors.white)
+                          : const Text(
+                              "Login",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                    ),
+                    SizedBox(height: 16),
+                    Center(
+                      child: RichText(
+                        text: TextSpan(
+                          text: "Don't have an account?  ",
+                          style: TextStyle(color: Colors.grey[600]),
+                          children: [
+                            TextSpan(
+                              text: "Sign Up",
+                              style: Theme.of(context).textTheme.bodyLarge
+                                  ?.copyWith(
+                                    color: Theme.of(context).primaryColor,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () {
+                                  getit<AppRouter>().push(SignupScreen());
+                                  // Navigator.push(
+                                  //   context,
+                                  //   MaterialPageRoute(
+                                  //     builder: (context) => SignupScreen(),
+                                  //   ),
+                                  // );
+                                },
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

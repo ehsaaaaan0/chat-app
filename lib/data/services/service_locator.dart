@@ -20,5 +20,7 @@ Future<void> setUpServiceLocator() async {
   );
   getit.registerLazySingleton<FirebaseAuth>(() => FirebaseAuth.instance);
   getit.registerLazySingleton(() => AuthRepository());
-  getit.registerFactory(() => AuthCubit(authRepository: AuthRepository()));
+  getit.registerLazySingleton(
+    () => AuthCubit(authRepository: AuthRepository()),
+  );
 }
